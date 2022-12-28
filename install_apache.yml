@@ -1,0 +1,39 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: update apt repo
+    apt:
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install apache2 pkg
+    apt:
+      name: apache2
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: update repo
+    yum:
+       update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: install apache
+    yum:
+      name: httpd
+      state: present
+    when: ansible_distribution == "CentOS"
+
+  - name: enable server
+    systemd:
+      name: httpd
+      enabled: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: start server
+    service:
+      name: httpd
+      state: started
+    when: ansible_distribution == "CentOS"
