@@ -4,23 +4,25 @@
   become: true
   tasks:
 
-  - name: update apt repo
+  - name: install updates Ubuntu
     apt:
+      upgrade: dist
       update_cache: yes
     when: ansible_distribution == "Ubuntu"
 
-  - name: install apache2 pkg
+  - name: install updates CentOS
+    yum:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: install apache2 pkg for Ubuntu
     apt:
       name: apache2
       state: latest
     when: ansible_distribution == "Ubuntu"
 
-  - name: update repo
-    yum:
-       update_cache: yes
-    when: ansible_distribution == "CentOS"
-
-  - name: install apache
+  - name: install apache for CentOS
     yum:
       name: httpd
       state: present
@@ -36,4 +38,14 @@
     service:
       name: httpd
       state: started
+    when: ansible_distribution == "CentOS"
+
+  - name: start port 80 on firewall Centos
+    shell:
+      "firewall-cmd --add-port=80/tcp"
+#    firewalld:
+#      zone: public
+#      port: 80/tcp
+#      state: enabled
+#      permanent: true
     when: ansible_distribution == "CentOS"
